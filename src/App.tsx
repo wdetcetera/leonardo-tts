@@ -1,3 +1,5 @@
+import Switch from "@mui/material/Switch";
+
 import {
   Box,
   //Button,
@@ -7,59 +9,68 @@ import {
   ThemeProvider,
   Typography,
   createTheme,
-} from '@mui/material';
+} from "@mui/material";
 import {
   //ActionRequest,
   //AudioActionResponse,
   ChatController,
   //FileActionResponse,
   MuiChat,
-} from 'chat-ui-react';
-import React from 'react';
+} from "./libs/leonardo/esm/index";
+import React from "react";
+import { useState,useCallback } from "react";
 
 const muiTheme = createTheme({
   palette: {
     primary: {
-      main: '#d5654d',
+      main: "#d5654d",
     },
   },
 });
 
 export function App(): React.ReactElement {
+  const label = { inputProps: { "aria-label": "Audio" } };
+  const [audio, setAudio] = useState(false);
+  const [chat, setChat] = useState({ welcome: false });
+
+  const handleAudioStatus = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.checked);
+    setAudio(e.target.checked);
+  },[]);
   const [chatCtl] = React.useState(
     new ChatController({
       showDateTime: true,
-    }),
+    })
   );
 
   React.useMemo(() => {
-    echo(chatCtl);
-  }, [chatCtl]);
+    echo(chatCtl,audio,chat);
+  }, [chatCtl,audio,chat]);
 
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <Box sx={{ height: '100%', backgroundColor: 'gray' }}>
+      <Box sx={{ height: "100%", backgroundColor: "gray" }}>
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            maxWidth: '640px',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            bgcolor: 'background.default',
-          }}
-        >
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            maxWidth: "640px",
+            marginLeft: "auto",
+            marginRight: "auto",
+            bgcolor: "background.default",
+          }}>
           <Typography sx={{ p: 1 }}>
-            Welcome to{' '}
-            <Link href="https://wpopera.co/leonardo/">
-              LEONARDO
-            </Link>{' '}
-            .
+            Welcome to <Link href='https://wpopera.co/leonardo/'>LEONARDO</Link>{" "}
+            <span style={{ marginLeft: 20 }}>
+              {label.inputProps["aria-label"]}
+            </span>
+            <Switch {...label} onChange={handleAudioStatus} />
           </Typography>
+
           <Divider />
-          <Box sx={{ flex: '1 1 0%', minHeight: 0 }}>
+          <Box sx={{ flex: "1 1 0%", minHeight: 0 }}>
             <MuiChat chatController={chatCtl} />
           </Box>
         </Box>
@@ -69,195 +80,92 @@ export function App(): React.ReactElement {
 }
 
 async function fetchJARVIS(text: string): Promise<string> {
-  let response = await fetch('https://integrationhub.wpopera.cloud/webhook/generate?topic=' + text);
+  let response = await fetch(
+    "https://integrationhub.wpopera.cloud/webhook/38b2f0fa-9a5a-49b4-be15-71d58b60bcba?topic=" +
+      text
+  );
   return await response.text();
 }
 
-async function echo(chatCtl: ChatController): Promise<void> {
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `Please enter something.`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-  const text = await chatCtl.setActionRequest({
-    type: 'text',
-    placeholder: 'Please ask me something',
-    sendButtonText:"Chat",
-    onClick:()=>{alert("clicked")}
-  });
-  const response = await fetchJARVIS(text.value);
-  await chatCtl.addMessage({
-    type: 'Send',
-    content: `${response.trim()}`,
-    self: false,
-    avatar: 'face.png',
-  });
-
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `What is your gender?`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-  // const sel = await chatCtl.setActionRequest({
-  //   type: 'select',
-  //   options: [
-  //     {
-  //       value: 'man',
-  //       text: 'Man',
-  //     },
-  //     {
-  //       value: 'woman',
-  //       text: 'Woman',
-  //     },
-  //     {
-  //       value: 'other',
-  //       text: 'Other',
-  //     },
-  //   ],
-  // });
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `You have selected ${sel.value}.`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `What is your favorite fruit?`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-  // const mulSel = await chatCtl.setActionRequest({
-  //   type: 'multi-select',
-  //   options: [
-  //     {
-  //       value: 'apple',
-  //       text: 'Apple',
-  //     },
-  //     {
-  //       value: 'orange',
-  //       text: 'Orange',
-  //     },
-  //     {
-  //       value: 'none',
-  //       text: 'None',
-  //     },
-  //   ],
-  // });
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `You have selected '${mulSel.value}'.`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `What is your favorite picture?`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-  // const file = (await chatCtl.setActionRequest({
-  //   type: 'file',
-  //   accept: 'image/*',
-  //   multiple: true,
-  // })) as FileActionResponse;
-  // await chatCtl.addMessage({
-  //   type: 'jsx',
-  //   content: (
-  //     <div>
-  //       {file.files.map((f) => (
-  //         <img
-  //           key={file.files.indexOf(f)}
-  //           src={window.URL.createObjectURL(f)}
-  //           alt="File"
-  //           style={{ width: '100%', height: 'auto' }}
-  //         />
-  //       ))}
-  //     </div>
-  //   ),
-  //   self: false,
-  //   avatar: '-',
-  // });
-
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `Please enter your voice.`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-  // const audio = (await chatCtl
-  //   .setActionRequest({
-  //     type: 'audio',
-  //   })
-  //   .catch(() => ({
-  //     type: 'audio',
-  //     value: 'Voice input failed.',
-  //     avatar: '-',
-  //   }))) as AudioActionResponse;
-  // await (audio.audio
-  //   ? chatCtl.addMessage({
-  //       type: 'jsx',
-  //       content: (
-  //         <a href={window.URL.createObjectURL(audio.audio)}>Audio downlaod</a>
-  //       ),
-  //       self: false,
-  //       avatar: '-',
-  //     })
-  //   : chatCtl.addMessage({
-  //       type: 'text',
-  //       content: audio.value,
-  //       self: false,
-  //       avatar: '-',
-  //     }));
-
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `Please press the button.`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-  // const good = await chatCtl.setActionRequest({
-  //   type: 'custom',
-  //   Component: GoodInput,
-  // });
-  // await chatCtl.addMessage({
-  //   type: 'text',
-  //   content: `You have pressed the ${good.value} button.`,
-  //   self: false,
-  //   avatar: '-',
-  // });
-
-  echo(chatCtl);
+async function fetchAudio(text: string) {
+  let response = await fetch(
+    "https://integrationhub.wpopera.cloud/webhook/text-to-speech?text=" + text
+  );
+  return await response.text();
 }
 
-// function GoodInput({
-//   chatController,
-//   actionRequest,
-// }: {
-//   chatController: ChatController;
-//   actionRequest: ActionRequest;
-// }) {
-//   const chatCtl = chatController;
+async function echo(chatCtl: ChatController,audio:boolean,chat: any): Promise<void> {
+  const greetigns = [
+    " Good morning! 🌞",
+    " Good afternoon!",
+    " Good evening!",
+    " Good night!",
+  ];
+  const saluts = [
+    "Hi there! 😊 ",
+    "Hey there! 😊 ",
+    "Yo, what's up? 🙂",
+    "Hey, I do not thinkg I know you, What's going on?",
+    "Oi, mate, what's new? 😄",
+    "Wow, are you new here? How's it going? 😊",
+    "Hey! I can be shy when I meet new people 🤭",
+    "Ah I like meeting new people, how are you doing? 😄",
+    "Howdy! 😄",
+    "Hiya! 😄",
+  ];
 
-//   const setResponse = React.useCallback((): void => {
-//     const res = { type: 'custom', value: 'Good!' };
-//     chatCtl.setActionResponse(actionRequest, res);
-//   }, [actionRequest, chatCtl]);
+  let currentTime = new Date();
+  let hours = currentTime.getHours();
+  let salut = "";
+  if (hours < 12) {
+    salut = saluts[Math.floor(Math.random() * saluts.length)] + greetigns[0];
+  } else if (hours >= 12 && hours < 17) {
+    salut = saluts[Math.floor(Math.random() * saluts.length)]+ greetigns[1];
+  } else if (hours >= 17 && hours < 20) {
+    salut = saluts[Math.floor(Math.random() * saluts.length)]+ greetigns[2];
+  } else {
+    salut = saluts[Math.floor(Math.random() * saluts.length)] + greetigns[3];
+  }
+  if (!chat.welcome) {
+    chat.welcome = true;
+    await chatCtl.addMessage({
+      type: "text",
+      content: salut + "",
+      self: false,
+      avatar: "face.png",
+    });
+  }
 
-//   return (
-//     <div>
-//       <Button
-//         type="button"
-//         onClick={setResponse}
-//         variant="contained"
-//         color="primary"
-//       >
-//         Good!
-//       </Button>
-//     </div>
-//   );
-// }
+  const text = await chatCtl.setActionRequest({
+    type: "text",
+    placeholder: "Please ask me something",
+    sendButtonText: "Chat",
+    onClick: () => {
+      alert("clicked");
+    },
+  });
+  await fetchJARVIS(text.value).then(
+    async (response) => {
+      console.log({response});
+      await chatCtl.addMessage({
+        type: "text",
+        content: `${response.trim()}`,
+        self: false,
+        avatar: "face.png",
+      });
+      if (audio) {
+        await fetchAudio(response).then(async (audio) => {
+          await chatCtl.addMessage({
+            type: "jsx",
+            content: <span dangerouslySetInnerHTML={{ __html: audio }} />,
+            self: false,
+            avatar: "face.png",
+          });
+        });
+      }
+    }
+  );
+
+  echo(chatCtl,audio,chat);
+}
+
