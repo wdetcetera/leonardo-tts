@@ -4,36 +4,47 @@ const OpenAI = require("openai");
 const path = require("path");
 
 const openai = new OpenAI({
-	apiKey: process.env.OPENAI_API_KEY,
+        apiKey: process.env.OPENAI_API_KEY,
 });
 
-const _input = fs.readFileSync(path.resolve("./input.txt"), "utf8");
-console.log(_input);
+var _input = process.argv[2];
+var _path = process.argv[3];
+if ( _path === undefined)
+{
+        _path="./"
+}
 
-const _output = path.resolve("./output.mp3");
-console.log(_output);
+if (_input === undefined) {
+        _input = fs.readFileSync(path.resolve(_path+"input.txt"), "utf8");
+}
+
+
+
+const _output = path.resolve(_path+"output.mp3");
+
+
 const voice = ["alloy", "echo", "fable", "onyx", "nova",  "shimmer"];
 
 async function TTS() {
-	try {
-		console.log("Speech synthesis initializing.");
-		const mp3 = await openai.audio.speech.create({
-			model: "tts-1-hd",
-			voice: voice[Math.floor(Math.random() * voice.length)],
-			input: _input,
-		});
+        try {
+                const mp3 = await openai.audio.speech.create({
+                        model: "tts-1-hd",
+                        voice: voice[4], //voice[Math.floor(Math.random() * voice.length)],
+                        input: _input,
+                });
 
-		if (fs.existsSync(_output)) {
-			fs.unlinkSync(_output);
-		}
+                if (fs.existsSync(_output)) {
+                        fs.unlinkSync(_output);
+                }
 
-		const buffer = Buffer.from(await mp3.arrayBuffer());
-		await fs.promises.writeFile(_output, buffer);
-		await fs.promises.writeFile('base64.txt', buffer.toString('base64'));
-		console.log("Speech synthesis complete.");
-	} catch (error) {
-		console.log("Speech synthesis failed.");
-		console.error(error);
-	}
+                const buffer = Buffer.from(await mp3.arrayBuffer());
+                await fs.promises.writeFile(_output, buffer);
+                await fs.promises.writeFile(_path+'base64.txt', buffer.toString('base64'));
+                const base64 = fs.readFileSync(path.resolve(_path+"base64.txt"), "utf8");
+                console.log(base64);
+        } catch (error) {
+                console.log("Speech synthesis failed.");
+                console.error(error);
+        }
 }
 TTS();
