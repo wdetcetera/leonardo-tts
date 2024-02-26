@@ -61,8 +61,8 @@ export function App(): React.ReactElement {
             marginRight: "auto",
             bgcolor: "background.default",
           }}>
-          <Typography sx={{ p: 1 }}>
-            Welcome to <Link href='https://wpopera.co/leonardo/'>LEONARDO</Link>{" "}
+          <Typography sx={{ diplay:'none', p: 1 }}>
+             Welcome to <Link href='https://wpopera.co/leonardo/'>LEONARDO</Link>{" "} 
             <span style={{ marginLeft: 20 }}>
               {label.inputProps["aria-label"]}
             </span>

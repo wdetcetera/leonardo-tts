@@ -23,7 +23,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy-jarvis": "yarn build && s3cmd sync build/* s3://jarvis.wpopera.co --no-check-certificate --add-header=\"Cache-Control:max-age=0\" --acl-public --delete-removed  --force",
-    "deploy-leonardo": "yarn build && s3cmd sync build/* s3://leonardo.wpopera.cloud --no-check-certificate --add-header=\"Cache-Control:max-age=0\" --acl-public --delete-removed  --force",
+    "deploy-leonardo": "yarn build && s3cmd sync build/* s3://leonardo.wpopera.co --no-check-certificate --add-header=\"Cache-Control:max-age=0\" --acl-public --delete-removed  --force",
     "deploy-leocodex": "yarn build && s3cmd sync build/* s3://leocodex.wpopera.cloud --no-check-certificate --add-header=\"Cache-Control:max-age=0\" --acl-public --delete-removed  --force"
   },
   "eslintConfig": {
